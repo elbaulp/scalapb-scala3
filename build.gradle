@@ -1,0 +1,61 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.16'
+    }
+}
+
+plugins {
+    id 'base'
+    id 'com.google.protobuf' version '0.8.16'
+    id 'scala'
+    id 'maven-publish'
+    id 'net.researchgate.release' version '2.8.1'
+}
+
+ext {
+    scalapbVersion = '0.11.3'
+    scalapbRuntimeGrpc = '0.11.3'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    implementation("org.scala-lang:scala3-library_3:3.0.0")
+    implementation("com.thesamet.scalapb:scalapb-runtime-grpc_3:${scalapbRuntimeGrpc}")
+    implementation("com.thesamet.scalapb:compilerplugin_3:${scalapbRuntimeGrpc}")
+    implementation("com.thesamet.scalapb:scalapb-runtime_3:${scalapbVersion}")
+}
+
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.additionalParameters = ["-Ytasty-reader"]
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.17.0'
+    }
+    plugins {
+        scalapb {
+            artifact = "com.thesamet.scalapb:protoc-gen-scala:${scalapbVersion}:unix@sh"
+        }
+    }
+
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                remove java
+            }
+            task.plugins {
+                scalapb {
+                    option 'flat_package'
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package io.test;
+
+import "scalapb/scalapb.proto";
+// Options for scalapb generation
+option (scalapb.options) = {
+  // Do not encode the proto file name into the package name
+  flat_package: false
+  // Generate all classes into a single file
+  single_file: true
+};
+
+
+option java_package = "io.test";
+option java_outer_classname = "TestEvent";
+
+message OuterEvent {
+    oneof innerEvent {
+        InnerEventOne innerEventOne = 1;
+        InnerEventTwo innerEventTwo = 2;
+    }
+}
+
+enum Reason {
+    None = 0;
+    JustCause = 1;
+    NoParticularReason = 2;
+}
+
+message InnerEventOne {
+    string id = 1;
+    Reason reason = 3;
+    string some_snake_case = 4;
+    string someCamelCase = 5;
+}
+
+message InnerEventTwo {
+    string id = 1;
+    Reason reason = 3;
+}
